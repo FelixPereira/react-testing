@@ -2,16 +2,16 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: CI
-env:
+env: 
   SCREENER_API_KEY: ${{ secrets.SCREENER_API_KEY }}
   SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
   SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -20,29 +20,33 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [14.x, 16.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Install dependencies 📦
-      #Using npm ci is generally faster than running npm install
-      run: |
+        cache: 'npm'
+    - name: Install depencies
+      run: | 
         cd my-app
         npm ci
-    - name: Build the app 🏗
+    - name: Build the app
       run: |
         cd my-app
         npm run build
-    - name: Run component tests 🔸
-      run: |
+    - name: Run components tests
+      run: | 
         cd my-app
         npm run test
-    - name: Start the app 📤
-      run: |
+    - name: Start the app
+      run: | 
         cd my-app
         npm start &
-        npx wait-on --timeout 60000
+        npm wait-on --timeout 60000
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
