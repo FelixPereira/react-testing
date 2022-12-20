@@ -30,13 +30,13 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - name: Install depencies
+    - name: Install depedencies
       run: | 
         cd my-app
         npm ci
     - name: Build the app
       run: |
-        cd my-app
+        cd ../../my-app
         npm run build
     - name: Run components tests
       run: | 
